@@ -38,6 +38,8 @@ import pprint
 
 # print(Eval(board))
 
+ple, cont = 'O','X'
+
 def checkIsValid(board):
      numX = 0
      numO = 0
@@ -67,9 +69,9 @@ def EvalL(board):
           for col in range(len(board)):
                if row+1 <= 3 and col+1 <= 3:
                     if board[row][col] == board[row+1][col] and board[row+1][col] == board[row+1][col+1]:
-                         if board[row][col] == 'X':
+                         if board[row][col] == ple:
                               return 1
-                         elif board[row][col] == 'O':
+                         elif board[row][col] == cont:
                               return -1
     return 0
 
@@ -97,7 +99,7 @@ def minMaxL(board,player,states):
           for row in range(len(board)):
                for col in range(len(board)):
                     if board[row][col] == '-':
-                         board[row][col] = 'X'
+                         board[row][col] = ple
                          maxEval = max(minMaxL(board,False,states+1),maxEval)
                          board[row][col] = '-'
           return maxEval
@@ -107,7 +109,7 @@ def minMaxL(board,player,states):
           for row in range(len(board)):
                for col in range(len(board)):
                     if board[row][col] == '-':
-                         board[row][col] = 'O'
+                         board[row][col] = cont
                          minEval = min(minMaxL(board,True,states+1),minEval)
                          board[row][col] = '-'
           return minEval
@@ -121,9 +123,9 @@ def bestMove(board, player):
           for col in range(len(board)):
                if board[row][col] == '-':
                     board[row][col] = player
-                    if player == 'X':
+                    if player == ple:
                          score = minMaxL(board, False, 0)
-                    if player == 'O':
+                    if player == cont:
                          score = minMaxL(board, True, 0)
                     board[row][col] = '-'
                     if score > maxScore:
@@ -133,33 +135,45 @@ def bestMove(board, player):
      board[move[0]][move[1]] = player
      pprint.pprint(board)
      print("")
-     return score,move
+     return maxScore,move
      
 boardL = [
      ['X','X','O','O'],
-     ['*','-','-','O'],
-     ['-','X','*','*'],
-     ['*','*','*','*']  
+     ['-','X','-','-'],
+     ['-','-','+','+'],
+     ['+','+','+','+']  
 ]
 
-def play(board, player):
-     if not checkIsValid(board):
-          return False
+# def play(board, player):
+#      if not checkIsValid(board):
+#           return False
 
-     flag = True
-     while flag:
-          points = EvalL(board)
+#      flag = True
+#      points = 0
+#      while flag:
+#           points = EvalL(board)
 
-          if points == 1 or points == -1:
-               flag = False
-               break
+#           if points == 1 or points == -1:
+#                flag = False
+#                break
      
-          if isMovesLeft(board) == False:
-               return 0
+#           if isMovesLeft(board) == False:
+#                return 0
           
-          bestMove(board, player)
-          player = 'O'
+#           bestMove(board, player)
+#           player = 'O'
+     
+#      if points == 1 :
+#           # pprint.pprint(board)
+#           # print('GANO X')
+#           # print("")
+#           return points
+#      if points == -1:
+#           # pprint.pprint(board)
+#           # print('GANO O')
+#           # print("")
+#           return points
      
 
 
-(play(boardL, 'O'))
+print(bestMove(boardL, ple))
