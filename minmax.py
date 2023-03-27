@@ -38,7 +38,7 @@ import pprint
 
 # print(Eval(board))
 
-ple, cont = 'X','O'
+
 
 def checkIsValid(board):
      numX = 0
@@ -56,9 +56,9 @@ def checkIsValid(board):
 
 def isMovesLeft(board) : 
   
-    for i in range(4) :
-        for j in range(4) :
-            if (board[i][j] == '-') :
+    for i in range(len(board)):
+        for j in range(len(board)):
+            if (board[i][j] == '-'):
                 return True 
     return False
 
@@ -69,79 +69,96 @@ def EvalL(board):
           for col in range(len(board)):
                if row+1 <= 3 and col+1 <= 3:
                     if board[row][col] == board[row+1][col] and board[row+1][col] == board[row+1][col+1]:
-                         if board[row][col] == ple:
+                         if board[row][col] == X:
                               return 1
-                         elif board[row][col] == cont:
+                         elif board[row][col] == O:
                               return -1
     return 0
 
 #! max -> X(true) min -> O (false)
 
 def minMaxL(board,player,states):
+     
+     '''States -> cantidad de llamados recursivos que hace'''
+     #TODO poner como limite cierta cantidad de states
+     
      points = EvalL(board)
 
      if points == 1 :
-          # pprint.pprint(board)
-          # print('GANO X')
-          # print("")
-          return points
+          return points, states
      if points == -1:
-          # pprint.pprint(board)
-          # print('GANO O')
-          # print("")
-          return points
+          return points, states
      
      if isMovesLeft(board) == False:
-          return 0
+          return 0, states
      
      if player:
           maxEval = float('-inf')
           for row in range(len(board)):
                for col in range(len(board)):
                     if board[row][col] == '-':
-                         board[row][col] = ple
-                         maxEval = max(minMaxL(board,False,states+1),maxEval)
+                         board[row][col] = X
+                         score, states = minMaxL(board,False,states+1)
+                         maxEval = max(score ,maxEval)
                          board[row][col] = '-'
-          return maxEval
+          return maxEval, states
      
      else:
           minEval = float('inf')
           for row in range(len(board)):
                for col in range(len(board)):
                     if board[row][col] == '-':
-                         board[row][col] = cont
-                         minEval = min(minMaxL(board,True,states+1),minEval)
+                         board[row][col] = O
+                         score, states = minMaxL(board,True,states+1)
+                         minEval = min(score ,minEval)
                          board[row][col] = '-'
-          return minEval
+          return minEval, states
 
                     
 def bestMove(board, player):
      
      maxScore = float('-inf')
+     minScore = float('inf')
+     maxStates = float('inf')
      move = ()
      for row in range(len(board)):
           for col in range(len(board)):
                if board[row][col] == '-':
                     board[row][col] = player
-                    if player == ple:
-                         score = minMaxL(board, False, 0)
-                    if player == cont:
-                         score = minMaxL(board, True, 0)
+                    if player == X:
+                         score, states = minMaxL(board, False, 0)
+                         if score >= maxScore and states < maxStates:
+                              maxScore = score
+                              maxStates = states
+                              move = (row,col)
+                              '''Si encuentra una jugada que gana directamente hace break'''
+                              if states == 0:
+                                   break
+                    if player == O:
+                         score, states = minMaxL(board, True, 0)
+                         if score <= minScore and states < maxStates:
+                              minScore = score
+                              maxStates = states
+                              move = (row,col)
                     board[row][col] = '-'
-                    if score > maxScore:
-                         maxScore = score
-                         move = (row,col)
+          if states == 0:
+               break
+                    
 
      board[move[0]][move[1]] = player
      pprint.pprint(board)
      print("")
-     return maxScore,move
+     
+     if maxScore == float('-inf'):
+          return minScore, move
+     if minScore == float('inf'):
+          return maxScore,move
      
 boardL = [
-     ['X','X','O','O'],
-     ['O','X','-','-'],
-     ['-','-','+','+'],
-     ['+','+','+','+']  
+     ['X','-','-','O'],
+     ['-','X','-','-'],
+     ['-','-','X','-'],
+     ['O','-','-','O']  
 ]
 
 # def play(board, player):
@@ -174,7 +191,6 @@ boardL = [
 #           # print("")
 #           return points
      
-
-
-print(bestMove(boardL, ple))
+X, O = 'X','O'
+print(bestMove(boardL, X))
 # print(play(boardL,ple))
