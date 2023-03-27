@@ -38,7 +38,7 @@ import pprint
 
 # print(Eval(board))
 
-ple, cont = 'O','X'
+ple, cont = 'X','O'
 
 def checkIsValid(board):
      numX = 0
@@ -139,7 +139,7 @@ def bestMove(board, player):
      
 boardL = [
      ['X','X','O','O'],
-     ['-','X','-','-'],
+     ['O','X','-','-'],
      ['-','-','+','+'],
      ['+','+','+','+']  
 ]
@@ -161,7 +161,7 @@ boardL = [
 #                return 0
           
 #           bestMove(board, player)
-#           player = 'O'
+#           player = cont
      
 #      if points == 1 :
 #           # pprint.pprint(board)
@@ -177,3 +177,4 @@ boardL = [
 
 
 print(bestMove(boardL, ple))
+# print(play(boardL,ple))
