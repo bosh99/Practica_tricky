@@ -77,7 +77,7 @@ def EvalL(board):
 
 #! max -> X(true) min -> O (false)
 
-def minMaxL(board,player,states):
+def minMaxL(board,player,states, limit):
      
      '''States -> cantidad de llamados recursivos que hace'''
      #TODO poner como limite cierta cantidad de states
@@ -92,13 +92,16 @@ def minMaxL(board,player,states):
      if isMovesLeft(board) == False:
           return 0, states
      
+     if states == limit:
+          return points,states
+     
      if player:
           maxEval = float('-inf')
           for row in range(len(board)):
                for col in range(len(board)):
                     if board[row][col] == '-':
                          board[row][col] = X
-                         score, states = minMaxL(board,False,states+1)
+                         score, states = minMaxL(board,False,states+1, limit)
                          maxEval = max(score ,maxEval)
                          board[row][col] = '-'
           return maxEval, states
@@ -109,13 +112,13 @@ def minMaxL(board,player,states):
                for col in range(len(board)):
                     if board[row][col] == '-':
                          board[row][col] = O
-                         score, states = minMaxL(board,True,states+1)
+                         score, states = minMaxL(board,True,states+1,limit)
                          minEval = min(score ,minEval)
                          board[row][col] = '-'
           return minEval, states
 
                     
-def bestMove(board, player):
+def bestMove(board, player, limit):
      
      maxScore = float('-inf')
      minScore = float('inf')
@@ -126,7 +129,7 @@ def bestMove(board, player):
                if board[row][col] == '-':
                     board[row][col] = player
                     if player == X:
-                         score, states = minMaxL(board, False, 0)
+                         score, states = minMaxL(board, False, 0, limit)
                          if score >= maxScore and states < maxStates:
                               maxScore = score
                               maxStates = states
@@ -135,7 +138,7 @@ def bestMove(board, player):
                               if states == 0:
                                    break
                     if player == O:
-                         score, states = minMaxL(board, True, 0)
+                         score, states = minMaxL(board, True, 0, limit)
                          if score <= minScore and states < maxStates:
                               minScore = score
                               maxStates = states
@@ -146,8 +149,7 @@ def bestMove(board, player):
                     
 
      board[move[0]][move[1]] = player
-     pprint.pprint(board)
-     print("")
+     # pprint.pprint(board)
      
      if maxScore == float('-inf'):
           return minScore, move
@@ -155,42 +157,89 @@ def bestMove(board, player):
           return maxScore,move
      
 boardL = [
+     ['-','-','-','X'],
      ['X','-','-','O'],
-     ['-','X','-','-'],
-     ['-','-','X','-'],
-     ['O','-','-','O']  
+     ['O','-','-','-'],
+     ['X','O','-','-']  
 ]
 
-# def play(board, player):
-#      if not checkIsValid(board):
-#           return False
+def EvE(board, player, limit):
+     if not checkIsValid(board):
+          return False
 
-#      flag = True
-#      points = 0
-#      while flag:
-#           points = EvalL(board)
+     flag = True
+     points = 0
+     while flag:
+          points = EvalL(board)
 
-#           if points == 1 or points == -1:
-#                flag = False
-#                break
+          if points == 1 or points == -1:
+               flag = False
+               break
      
-#           if isMovesLeft(board) == False:
-#                return 0
+          if isMovesLeft(board) == False:
+               flag = False
+               return 0
           
-#           bestMove(board, player)
-#           player = cont
+          bestMove(board, player, limit)
+          pprint.pprint(board)
+          val = input('PAUSA')
+
+          if player == O:
+               player = X
+          else:
+               player = O
      
-#      if points == 1 :
-#           # pprint.pprint(board)
-#           # print('GANO X')
-#           # print("")
-#           return points
-#      if points == -1:
-#           # pprint.pprint(board)
-#           # print('GANO O')
-#           # print("")
-#           return points
+     if points == 1 :
+          pprint.pprint(board)
+          print('GANO X')
+          print("")
+          return points
+     if points == -1:
+          pprint.pprint(board)
+          print('GANO O')
+          print("")
+          return points
+
+def PvE(board, player, limit):
+     if not checkIsValid(board):
+          return False
+
+     flag = True
+     points = 0
+     while flag:
+          points = EvalL(board)
+
+          if points == 1 or points == -1:
+               flag = False
+               break
      
+          if isMovesLeft(board) == False:
+               flag = False
+               return 0
+          
+          if player == O:
+               pprint.pprint(board)
+               posI = int(input('Ingrese el numero de la fila: '))
+               posJ = int(input('Ingrese el numero de la columna: '))
+               board[posI][posJ] = player
+               player = X
+               
+          else:
+               bestMove(board, player, limit)
+               player = O
+     
+     if points == 1 :
+          pprint.pprint(board)
+          print('GANO X')
+          print("")
+          return points
+     if points == -1:
+          pprint.pprint(board)
+          print('GANO O')
+          print("")
+          return points
+
 X, O = 'X','O'
-print(bestMove(boardL, X))
-# print(play(boardL,ple))
+# print(bestMove(boardL, O))
+EvE(boardL,X, 1000000000000)
+# PvE(boardL, X, 1000)
