@@ -58,7 +58,7 @@ def minMaxL(board, player, states, limit):
           return 0, states
      
      if states == limit:
-          return points,states
+          return points,states-1 #CREO QUE RESTANDOLE AQUI MEJORA
      
      if player:
           maxEval = float('-inf')
@@ -69,7 +69,7 @@ def minMaxL(board, player, states, limit):
                          score, states = minMaxL(board,False,states+1, limit)
                          maxEval = max(score ,maxEval)
                          board[row][col] = '-'
-                         states-=1 
+                         # states-=1 
           return maxEval, states
      
      else:
@@ -81,14 +81,14 @@ def minMaxL(board, player, states, limit):
                          score, states = minMaxL(board,True,states+1,limit)
                          minEval = min(score ,minEval)
                          board[row][col] = '-'
-                         states-=1 
+                         # states-=1 
           return minEval, states
 
                     
 def bestMove(board, player, limit):
      
      maxScore = float('-inf')
-     # minScore = float('inf')
+     minScore = 1
      maxStates = float('inf')
      states = -1 #! NUEVO
      move = ()
@@ -111,12 +111,12 @@ def bestMove(board, player, limit):
                     elif player == O:
                          score, states = minMaxL(board, True, 0, limit)
                          board[row][col] = '-'
-                         if score < 1: #! NUEVO 
-                              maxScore = score
+                         if score < minScore: #! NUEVO 
+                              minScore = score
                               # maxStates = states
                               move = (row,col)
                          if states == 0:
-                              maxScore = score
+                              minScore = score
                               move = (row, col)
                               break
           if states == 0:
@@ -129,8 +129,10 @@ def bestMove(board, player, limit):
      board[move[0]][move[1]] = player
      # pprint.pprint(board)
      
-     
-     return maxScore, move
+     if player == X:
+          return maxScore, move
+     else:
+          return minScore, move
 
 #* EMPATE
 boardL = [
@@ -143,7 +145,7 @@ boardL = [
 
 # boardL = [
 #      ['X','-','-','X'],
-#      ['-','-','-','O'],
+#      ['-','X','-','O'],
 #      ['O','-','O','-'],
 #      ['X','O','-','X']  
 # ] 
@@ -212,7 +214,7 @@ def PvE(board, player, limit):
      
           if isMovesLeft(board) == False:
                flag = False
-               return 0
+               break
           
           if player == O:
                pprint.pprint(board)
@@ -236,12 +238,12 @@ def PvE(board, player, limit):
           print("")
           return points
      else: #! NUEVO
-          # pprint.pprint(board) 
+          pprint.pprint(board) 
           print('EMPATE')
           return points
 
 X, O = 'X','O'
 # print(bestMove(boardL, O))
-EvE(boardL,X, 200000000000)
+EvE(boardL,X, 10)
 # PvE(boardL, X, 1000000)
 # print(bestMove(boardL, O, 1000000))
